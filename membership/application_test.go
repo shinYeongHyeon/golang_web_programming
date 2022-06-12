@@ -8,27 +8,50 @@ import (
 func TestCreateMembership(t *testing.T) {
 	t.Run("멤버십을 생성한다.", func(t *testing.T) {
 		app := NewApplication(*NewRepository(map[string]Membership{}))
+
 		req := CreateRequest{"jenny", "naver"}
 		res, err := app.Create(req)
+
 		assert.Nil(t, err)
 		assert.NotEmpty(t, res.ID)
 		assert.Equal(t, req.MembershipType, res.MembershipType)
 	})
 
 	t.Run("이미 등록된 사용자 이름이 존재할 경우 실패한다.", func(t *testing.T) {
+		app := NewApplication(*NewRepository(map[string]Membership{}))
+		req := CreateRequest{"den", "toss"}
+		// NOTE: 위에서 이미 검증된 테스트케이스 이기 때문에 res, error 생략
+		app.Create(CreateRequest{req.UserName, req.MembershipType})
+		_, err := app.Create(CreateRequest{req.UserName, req.MembershipType})
 
+		assert.NotNil(t, err)
 	})
 
 	t.Run("사용자 이름을 입력하지 않은 경우 실패한다.", func(t *testing.T) {
+		app := NewApplication(*NewRepository(map[string]Membership{}))
+		req := CreateRequest{"", "toss"}
 
+		_, err := app.Create(CreateRequest{req.UserName, req.MembershipType})
+
+		assert.NotNil(t, err)
 	})
 
 	t.Run("멤버십 타입을 입력하지 않은 경우 실패한다.", func(t *testing.T) {
+		app := NewApplication(*NewRepository(map[string]Membership{}))
+		req := CreateRequest{"den", ""}
 
+		_, err := app.Create(CreateRequest{req.UserName, req.MembershipType})
+
+		assert.NotNil(t, err)
 	})
 
 	t.Run("naver/toss/payco 이외의 타입을 입력한 경우 실패한다.", func(t *testing.T) {
+		app := NewApplication(*NewRepository(map[string]Membership{}))
+		req := CreateRequest{"den", "chai"}
 
+		_, err := app.Create(CreateRequest{req.UserName, req.MembershipType})
+
+		assert.NotNil(t, err)
 	})
 }
 
