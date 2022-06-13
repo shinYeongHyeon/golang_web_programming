@@ -93,6 +93,11 @@ func (repository *Repository) Update(id string, name string, membershipType stri
 	return toUpdateMembership
 }
 
+// Delete : delete membership by id
+func (repository *Repository) Delete(id string) {
+	delete(repository.data, id)
+}
+
 func (repository *Repository) issueId() string {
 	return strconv.Itoa(len(repository.data) + 1)
 }

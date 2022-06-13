@@ -54,6 +54,18 @@ func (app *Application) Update(request UpdateRequest) (UpdateResponse, error) {
 }
 
 func (app *Application) Delete(id string) error {
+	if id == "" {
+		return errors.New("can not delete for empty member id")
+	}
+
+	membership := app.repository.Find(id)
+
+	if membership.ID == "" {
+		return errors.New("can not delete for not exist id")
+	}
+
+	app.repository.Delete(id)
+
 	return nil
 }
 
