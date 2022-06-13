@@ -55,29 +55,85 @@ func TestCreateMembership(t *testing.T) {
 	})
 }
 
+var defaultName = "den"
+var defaultMembershipType = "toss"
+
+func givenCreateDefaultNameMembership(app *Application) CreateResponse {
+	req := CreateRequest{defaultName, defaultMembershipType}
+	res, _ := app.Create(req)
+
+	return res
+}
+
 func TestUpdate(t *testing.T) {
 	t.Run("membership 정보를 갱신한다.", func(t *testing.T) {
+		var toUpdateName = "den_update"
+		var toUpdateMembershipType = "naver"
+		app := NewApplication(*NewRepository(map[string]Membership{}))
+		createResponse := givenCreateDefaultNameMembership(app)
 
+		req := UpdateRequest{createResponse.ID, toUpdateName, toUpdateMembershipType}
+		res, err := app.Update(req)
+
+		assert.Nil(t, err)
+		assert.Equal(t, req.UserName, res.UserName)
+		assert.Equal(t, req.MembershipType, res.MembershipType)
 	})
 
 	t.Run("수정하려는 사용자의 이름이 이미 존재하는 사용자 이름이라면 예외 처리한다.", func(t *testing.T) {
+		app := NewApplication(*NewRepository(map[string]Membership{}))
+		givenCreateDefaultNameMembership(app)
+		createResponse, _ := app.Create(CreateRequest{"den2", "naver"})
 
+		req := UpdateRequest{createResponse.ID, defaultName, "naver"}
+		_, err := app.Update(req)
+
+		assert.NotNil(t, err)
 	})
 
 	t.Run("멤버십 아이디를 입력하지 않은 경우, 예외 처리한다.", func(t *testing.T) {
+		app := NewApplication(*NewRepository(map[string]Membership{}))
 
+		req := UpdateRequest{"", "den2", "naver"}
+		_, err := app.Update(req)
+
+		assert.NotNil(t, err)
 	})
 
 	t.Run("사용자 이름을 입력하지 않은 경우, 예외 처리한다.", func(t *testing.T) {
+		app := NewApplication(*NewRepository(map[string]Membership{}))
 
+		req := UpdateRequest{"randomId", "", "toss"}
+		_, err := app.Update(req)
+
+		assert.NotNil(t, err)
 	})
 
 	t.Run("멤버쉽 타입을 입력하지 않은 경우, 예외 처리한다.", func(t *testing.T) {
+		app := NewApplication(*NewRepository(map[string]Membership{}))
 
+		req := UpdateRequest{"randomId", "den2", ""}
+		_, err := app.Update(req)
+
+		assert.NotNil(t, err)
 	})
 
 	t.Run("주어진 멤버쉽 타입이 아닌 경우, 예외 처리한다.", func(t *testing.T) {
+		app := NewApplication(*NewRepository(map[string]Membership{}))
 
+		req := UpdateRequest{"randomId", "den2", "chai"}
+		_, err := app.Update(req)
+
+		assert.NotNil(t, err)
+	})
+
+	t.Run("업데이트를 하려는 멤버쉽 아이디가 없는 경우, 예외 처리 한다.", func(t *testing.T) {
+		app := NewApplication(*NewRepository(map[string]Membership{}))
+
+		req := UpdateRequest{"randomId", "den", "toss"}
+		_, err := app.Update(req)
+
+		assert.NotNil(t, err)
 	})
 }
 

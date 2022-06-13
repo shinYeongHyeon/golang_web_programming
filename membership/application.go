@@ -1,6 +1,8 @@
 package membership
 
-import "errors"
+import (
+	"errors"
+)
 
 type Application struct {
 	repository Repository
@@ -15,12 +17,12 @@ func NewApplication(repository Repository) *Application {
 
 // Create : create for membership
 func (app *Application) Create(request CreateRequest) (CreateResponse, error) {
-	validateError := app.validateRequestParameters(request)
+	validateError := app.validateCreateRequestParameters(request)
 	if validateError != nil {
 		return CreateResponse{}, validateError
 	}
 
-	_, err := app.repository.Find(request.UserName)
+	_, err := app.repository.FindByName(request.UserName)
 	if err == nil {
 		return CreateResponse{}, errors.New("can not create for duplicate name")
 	}
@@ -30,8 +32,25 @@ func (app *Application) Create(request CreateRequest) (CreateResponse, error) {
 	return CreateResponse{membership.ID, membership.MembershipType}, nil
 }
 
+// Update : update for membership
 func (app *Application) Update(request UpdateRequest) (UpdateResponse, error) {
-	return UpdateResponse{}, nil
+	requestParameterErr := app.validateUpdateRequestParameters(request)
+	if requestParameterErr != nil {
+		return UpdateResponse{}, requestParameterErr
+	}
+
+	requestUserNameDuplicationErr := app.validateUpdateRequestDuplicateUserName(request)
+	if requestUserNameDuplicationErr != nil {
+		return UpdateResponse{}, requestUserNameDuplicationErr
+	}
+
+	membership := app.repository.Update(request.ID, request.UserName, request.MembershipType)
+
+	if membership.ID == "" {
+		return UpdateResponse{}, errors.New("can not update for not exist member id")
+	}
+
+	return UpdateResponse{membership.ID, membership.UserName, membership.MembershipType}, nil
 }
 
 func (app *Application) Delete(id string) error {
@@ -50,13 +69,42 @@ func isAvailableMembershipType(membershipType string) bool {
 	return isAvailable
 }
 
-func (app *Application) validateRequestParameters(request CreateRequest) error {
+func (app *Application) validateCreateRequestParameters(request CreateRequest) error {
 	if request.UserName == "" || request.MembershipType == "" {
 		return errors.New("can not create for empty name or empty membershipType")
 	}
 
 	if !isAvailableMembershipType(request.MembershipType) {
 		return errors.New("can not create for not available membershipType")
+	}
+
+	return nil
+}
+
+func (app *Application) validateUpdateRequestParameters(request UpdateRequest) error {
+	if request.ID == "" || request.UserName == "" || request.MembershipType == "" {
+		return errors.New("can not update for empty request")
+	}
+
+	if !isAvailableMembershipType(request.MembershipType) {
+		return errors.New("can not update for not available membershipType")
+	}
+	return nil
+}
+
+func (app *Application) validateUpdateRequestDuplicateUserName(request UpdateRequest) error {
+	foundMemberships := app.repository.FindAllByName(request.UserName)
+	var found = false
+
+	for _, foundMembership := range foundMemberships {
+		if foundMembership.ID != request.ID {
+			found = true
+			break
+		}
+	}
+
+	if found {
+		return errors.New("can not update for duplication name")
 	}
 
 	return nil

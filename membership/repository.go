@@ -17,7 +17,35 @@ func NewRepository(data map[string]Membership) *Repository {
 	return inMemoryRepository
 }
 
-func (repository *Repository) Find(name string) (Membership, error) {
+// Find : find membership by id
+func (repository *Repository) Find(id string) Membership {
+	var foundMembership Membership
+
+	for _, membership := range repository.data {
+		if membership.ID == id {
+			foundMembership = membership
+			break
+		}
+	}
+
+	return foundMembership
+}
+
+// FindAllByName : find all membership by name
+func (repository *Repository) FindAllByName(name string) []Membership {
+	var foundMemberships []Membership
+
+	for _, membership := range repository.data {
+		if membership.UserName == name {
+			foundMemberships = append(foundMemberships, membership)
+		}
+	}
+
+	return foundMemberships
+}
+
+// FindByName : find membership by name
+func (repository *Repository) FindByName(name string) (Membership, error) {
 	var foundMembership Membership
 	found := false
 
@@ -46,6 +74,23 @@ func (repository *Repository) Create(name string, membership string) Membership 
 	repository.data[id] = createdMembership
 
 	return createdMembership
+}
+
+func (repository *Repository) Update(id string, name string, membershipType string) Membership {
+	var toUpdateMembership Membership
+
+	for _, membership := range repository.data {
+		if membership.ID == id {
+			toUpdateMembership = Membership{
+				ID:             id,
+				UserName:       name,
+				MembershipType: membershipType,
+			}
+			repository.data[id] = toUpdateMembership
+		}
+	}
+
+	return toUpdateMembership
 }
 
 func (repository *Repository) issueId() string {
