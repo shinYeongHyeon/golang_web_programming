@@ -1,5 +1,12 @@
 package membership
 
+// FindResponse : response for find func
+type FindResponse struct {
+	ID             string
+	UserName       string
+	MembershipType string
+}
+
 type CreateRequest struct {
 	UserName       string
 	MembershipType string

@@ -167,3 +167,33 @@ func TestDelete(t *testing.T) {
 		assert.NotNil(t, err)
 	})
 }
+
+func TestFind(t *testing.T) {
+	t.Run("멤버십을 찾는다", func(t *testing.T) {
+		app := NewApplication(*NewRepository(map[string]Membership{}))
+		createResponse := givenCreateDefaultNameMembership(app)
+
+		res, err := app.Find(createResponse.ID)
+
+		assert.Nil(t, err)
+		assert.Equal(t, res.ID, createResponse.ID)
+		assert.Equal(t, res.UserName, defaultName)
+		assert.Equal(t, res.MembershipType, defaultMembershipType)
+	})
+
+	t.Run("찾으려는 id가 빈 값인 경우, 예외 처리한다", func(t *testing.T) {
+		app := NewApplication(*NewRepository(map[string]Membership{}))
+
+		_, err := app.Find("")
+
+		assert.NotNil(t, err)
+	})
+
+	t.Run("존재하지 않는 id를 찾으려 하는 경우, 예외 처리한다", func(t *testing.T) {
+		app := NewApplication(*NewRepository(map[string]Membership{}))
+
+		_, err := app.Find("randomId")
+
+		assert.NotNil(t, err)
+	})
+}

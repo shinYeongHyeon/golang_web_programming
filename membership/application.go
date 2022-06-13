@@ -15,6 +15,21 @@ func NewApplication(repository Repository) *Application {
 	return &Application{repository: repository}
 }
 
+// Find : find for membership
+func (app *Application) Find(id string) (FindResponse, error) {
+	if id == "" {
+		return FindResponse{}, errors.New("can not find for empty id")
+	}
+
+	membership := app.repository.Find(id)
+
+	if membership.ID == "" {
+		return FindResponse{}, errors.New("can not find user")
+	}
+
+	return FindResponse{membership.ID, membership.UserName, membership.MembershipType}, nil
+}
+
 // Create : create for membership
 func (app *Application) Create(request CreateRequest) (CreateResponse, error) {
 	validateError := app.validateCreateRequestParameters(request)
