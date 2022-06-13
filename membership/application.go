@@ -10,12 +10,10 @@ type Application struct {
 
 var availableMemberships = [3]string{"toss", "naver", "payco"}
 
-// NewApplication : Application struct 생성
 func NewApplication(repository Repository) *Application {
 	return &Application{repository: repository}
 }
 
-// Find : find for membership
 func (app *Application) Find(id string) (FindResponse, error) {
 	if id == "" {
 		return FindResponse{}, errors.New("can not find for empty id")
@@ -37,8 +35,8 @@ func (app *Application) Create(request CreateRequest) (CreateResponse, error) {
 		return CreateResponse{}, validateError
 	}
 
-	_, err := app.repository.FindByName(request.UserName)
-	if err == nil {
+	foundMembership := app.repository.FindByName(request.UserName)
+	if foundMembership.ID != "" {
 		return CreateResponse{}, errors.New("can not create for duplicate name")
 	}
 
@@ -68,6 +66,7 @@ func (app *Application) Update(request UpdateRequest) (UpdateResponse, error) {
 	return UpdateResponse{membership.ID, membership.UserName, membership.MembershipType}, nil
 }
 
+// Delete : delete for membership
 func (app *Application) Delete(id string) error {
 	if id == "" {
 		return errors.New("can not delete for empty member id")

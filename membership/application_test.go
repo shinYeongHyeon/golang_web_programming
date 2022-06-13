@@ -24,7 +24,7 @@ func TestCreateMembership(t *testing.T) {
 		app.Create(CreateRequest{req.UserName, req.MembershipType})
 		_, err := app.Create(CreateRequest{req.UserName, req.MembershipType})
 
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 	})
 
 	t.Run("사용자 이름을 입력하지 않은 경우 실패한다.", func(t *testing.T) {
@@ -33,7 +33,7 @@ func TestCreateMembership(t *testing.T) {
 
 		_, err := app.Create(CreateRequest{req.UserName, req.MembershipType})
 
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 	})
 
 	t.Run("멤버십 타입을 입력하지 않은 경우 실패한다.", func(t *testing.T) {
@@ -42,7 +42,7 @@ func TestCreateMembership(t *testing.T) {
 
 		_, err := app.Create(CreateRequest{req.UserName, req.MembershipType})
 
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 	})
 
 	t.Run("naver/toss/payco 이외의 타입을 입력한 경우 실패한다.", func(t *testing.T) {
@@ -51,7 +51,7 @@ func TestCreateMembership(t *testing.T) {
 
 		_, err := app.Create(CreateRequest{req.UserName, req.MembershipType})
 
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 	})
 }
 
@@ -88,7 +88,7 @@ func TestUpdate(t *testing.T) {
 		req := UpdateRequest{createResponse.ID, defaultName, "naver"}
 		_, err := app.Update(req)
 
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 	})
 
 	t.Run("멤버십 아이디를 입력하지 않은 경우, 예외 처리한다.", func(t *testing.T) {
@@ -97,7 +97,7 @@ func TestUpdate(t *testing.T) {
 		req := UpdateRequest{"", "den2", "naver"}
 		_, err := app.Update(req)
 
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 	})
 
 	t.Run("사용자 이름을 입력하지 않은 경우, 예외 처리한다.", func(t *testing.T) {
@@ -106,7 +106,7 @@ func TestUpdate(t *testing.T) {
 		req := UpdateRequest{"randomId", "", "toss"}
 		_, err := app.Update(req)
 
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 	})
 
 	t.Run("멤버쉽 타입을 입력하지 않은 경우, 예외 처리한다.", func(t *testing.T) {
@@ -115,7 +115,7 @@ func TestUpdate(t *testing.T) {
 		req := UpdateRequest{"randomId", "den2", ""}
 		_, err := app.Update(req)
 
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 	})
 
 	t.Run("주어진 멤버쉽 타입이 아닌 경우, 예외 처리한다.", func(t *testing.T) {
@@ -124,7 +124,7 @@ func TestUpdate(t *testing.T) {
 		req := UpdateRequest{"randomId", "den2", "chai"}
 		_, err := app.Update(req)
 
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 	})
 
 	t.Run("업데이트를 하려는 멤버쉽 아이디가 없는 경우, 예외 처리 한다.", func(t *testing.T) {
@@ -133,7 +133,7 @@ func TestUpdate(t *testing.T) {
 		req := UpdateRequest{"randomId", "den", "toss"}
 		_, err := app.Update(req)
 
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 	})
 }
 
@@ -155,7 +155,7 @@ func TestDelete(t *testing.T) {
 
 		err := app.Delete("")
 
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 	})
 
 	t.Run("입력한 id가 존재하지 않을 때 예외 처리한다.", func(t *testing.T) {
@@ -164,7 +164,7 @@ func TestDelete(t *testing.T) {
 
 		err := app.Delete("randomId")
 
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 	})
 }
 
@@ -186,7 +186,7 @@ func TestFind(t *testing.T) {
 
 		_, err := app.Find("")
 
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 	})
 
 	t.Run("존재하지 않는 id를 찾으려 하는 경우, 예외 처리한다", func(t *testing.T) {
@@ -194,6 +194,6 @@ func TestFind(t *testing.T) {
 
 		_, err := app.Find("randomId")
 
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 	})
 }

@@ -1,16 +1,17 @@
 package membership
 
 import (
-	"errors"
 	"strconv"
 )
 
+// Repository : struct for membership data
 type Repository struct {
 	data map[string]Membership
 }
 
 var inMemoryRepository *Repository
 
+// NewRepository : create repository
 func NewRepository(data map[string]Membership) *Repository {
 	inMemoryRepository = &Repository{data: data}
 
@@ -45,30 +46,26 @@ func (repository *Repository) FindAllByName(name string) []Membership {
 }
 
 // FindByName : find membership by name
-func (repository *Repository) FindByName(name string) (Membership, error) {
+func (repository *Repository) FindByName(name string) Membership {
 	var foundMembership Membership
-	found := false
 
 	for _, membership := range repository.data {
 		if membership.UserName == name {
-			found = true
 			foundMembership = membership
+			break
 		}
 	}
 
-	if !found {
-		return foundMembership, errors.New("Can not find " + name + " user")
-	}
-
-	return foundMembership, nil
+	return foundMembership
 }
 
-func (repository *Repository) Create(name string, membership string) Membership {
+// Create : save for membership by name, membershipType
+func (repository *Repository) Create(name string, membershipType string) Membership {
 	id := repository.issueId()
 	createdMembership := Membership{
 		ID:             id,
 		UserName:       name,
-		MembershipType: membership,
+		MembershipType: membershipType,
 	}
 
 	repository.data[id] = createdMembership
@@ -76,6 +73,7 @@ func (repository *Repository) Create(name string, membership string) Membership 
 	return createdMembership
 }
 
+// Update : update for membership by id, name, membershipType
 func (repository *Repository) Update(id string, name string, membershipType string) Membership {
 	var toUpdateMembership Membership
 
