@@ -1,0 +1,26 @@
+### Create
+POST localhost:8080/memberships
+Content-Type: application/json
+
+{
+  "userName": "hello4",
+  "membershipType": "toss"
+}
+
+### Find All
+GET localhost:8080/memberships?offset=0&limit=2
+
+### Find One
+GET localhost:8080/memberships/1
+
+### Update One
+PUT localhost:8080/memberships/1
+Content-Type: application/json
+
+{
+  "userName": "helloUpdated",
+  "membershipType": "toss"
+}
+
+### Delete One
+DELETE localhost:8080/memberships/1
